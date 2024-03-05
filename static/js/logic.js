@@ -19,11 +19,11 @@ var baseMaps = {
 
 L.control.layers(baseMaps).addTo(map);
 
-/// fetching fro the earthquake data 
+/// fetching for the earthquake data 
 fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson')
   .then(response => response.json())
   .then(data => {
-    /// looping through json tp find magnitude and plotting geometry 
+    /// looping through json to find magnitude and plotting geometry 
     var earthquakeLayer = L.layerGroup().addTo(map);
     data.features.forEach(feature => {
       var mag = feature.properties.mag;
@@ -65,16 +65,32 @@ fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson
 
         // add control layer to both overlay and base maps
         L.control.layers(baseMaps, overlayMaps).addTo(map);
+// add legend
+var legend = L.control({position: 'bottomright'});
+legend.onAdd = function (map) {
+  var div = L.DomUtil.create('div', 'info legend');
+  var depths = [-10, 10, 30, 50, 70, 90];
+  var labels = [];
+
+  for (var i = 0; i < depths.length; i++) {
+    div.innerHTML +=
+      '<i style="background:' + getColor(depths[i] + 1) + '"></i> ' +
+      depths[i] + (depths[i + 1] ? '&ndash;' + depths[i + 1] + ' km<br>' : '+ km');
+  }
+
+  return div;
+};
+legend.addTo(map);
       });
   });
 
 //change color based on depth value
 function getColor(d) {
-  return d > 90 ? '#800026' :
-         d > 70  ? '#BD0026' :
-         d > 50  ? '#E31A1C' :
-         d > 30  ? '#FC4E2A' :
-         d > 10  ? '#FD8D3C' :
-         d > -10 ? '#FEB24C' :
-                   '#FFEDA0';
+  return d > 90 ? '#9700ce' :
+         d > 70  ? '#0043ce' :
+         d > 50  ? '#00ce1b' :
+         d > 30  ? '#f8ff04' :
+         d > 10  ? '#ffad04' :
+         d > -10 ? '#ff4904' :
+                   '#ff0404';
 }
